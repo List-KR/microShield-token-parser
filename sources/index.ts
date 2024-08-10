@@ -1,16 +1,22 @@
 import * as TsMorph from 'ts-morph'
+import { Deobfuscate } from './deobfuscator.js'
 
-export type IExtractorOptions = {
-  CheckRegExToUseReverse: boolean
-  UseBuiltInDeobfuscator: boolean
+export type TExtractorOptions = {
+  CheckRegExToUseReverse?: boolean
+  UseBuiltInDeobfuscator?: boolean
 }
 export class Extractor {
   protected Code: string = ''
+  protected Options: TExtractorOptions = {}
   
-  constructor(Code: string) {
+  constructor(Code: string, Options: TExtractorOptions) {
     this.Code = Code
+    this.Options = Options
+    if (this.Options.UseBuiltInDeobfuscator) {
+      this.Code = Deobfuscate(this.Code)
+    }
   }
-
+  
   GetToken(): string {
     const ProjectInstance = new TsMorph.Project({
       compilerOptions: {
