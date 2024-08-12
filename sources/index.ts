@@ -1,5 +1,4 @@
 import * as TsMorph from 'ts-morph'
-import { Deobfuscate } from './deobfuscator.js'
 
 export type TExtractorOptions = {
   CheckRegExToUseReverse?: boolean
@@ -12,9 +11,6 @@ export class Extractor {
   constructor(Code: string, Options: TExtractorOptions) {
     this.Code = Code
     this.Options = Options
-    if (this.Options.UseBuiltInDeobfuscator) {
-      this.Code = Deobfuscate(this.Code)
-    }
   }
   
   GetToken(): string {
@@ -55,6 +51,9 @@ export class Extractor {
         }
       }
     })
-    return Tokens.join('')
+    if (Tokens.length && !this.Options.UseBuiltInDeobfuscator) {
+      return Tokens[0]
+    }
+    
   }
 }
