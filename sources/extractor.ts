@@ -65,56 +65,15 @@ export class AdvancedExtractor extends Extractor {
       useInMemoryFileSystem: true
     })
     const FileInstance = ProjectInstance.createSourceFile('code.js', this.Code, { overwrite: true })
-    let StringLiteralsList = FileInstance.getDescendantsOfKind(TsMorph.SyntaxKind.StringLiteral)
-    StringLiteralsList = StringLiteralsList.filter(StringLiteral => {
-      return StringLiteral.getFullText().includes('token=')
-    })
-    const TargetedTokenIdentifierList: Array<TsMorph.Identifier> = []
-    const TargetedTokenVars: Array<TsMorph.StringLiteral | TsMorph.CallExpression> = []
     const Tokens: string[] = []
-    StringLiteralsList.forEach(StringLiteral => {
-      StringLiteral.getParent().getParent().forEachChildAsArray().filter(Child => {
-        return Child.getFullText().includes('.join(')
-      }).forEach(Child => {
-        Child.getChildren().forEach(Child => {
-          Child.getChildren().forEach(Child => {
-            Child.getChildren().forEach(Child => {
-              TargetedTokenIdentifierList.push(...Child.getChildrenOfKind(TsMorph.SyntaxKind.Identifier))
-            })
-          })
-        })
+    
+    let EncoderNodes = FileInstance.getDescendantsOfKind(TsMorph.SyntaxKind.FunctionDeclaration)
+      .filter(Descendant => {
+        return Descendant.getParent().getChildrenOfKind(TsMorph.SyntaxKind.ExpressionStatement).length > 0
       })
-    })
-    TargetedTokenIdentifierList.forEach(Identifier => {
-      Identifier.findReferences().forEach(Reference => {
-        TargetedTokenVars.push(...Reference.getDefinition().getDeclarationNode().getChildrenOfKind(TsMorph.SyntaxKind.StringLiteral))
-        TargetedTokenVars.push(...Reference.getDefinition().getDeclarationNode().getChildrenOfKind(TsMorph.SyntaxKind.CallExpression))
+      .filter(EncoderNode => {
+        return EncoderNode.getKind() === TsMorph.SyntaxKind.FunctionDeclaration
       })
-    })
-    TargetedTokenVars.forEach(TargetedTokenVar => {
-      if (TargetedTokenVar.isKind(TsMorph.SyntaxKind.StringLiteral)) {
-        Tokens.push(TargetedTokenVar.getText().slice(1, -1))
-      } else {
-        TargetedTokenVar.getChildrenOfKind(TsMorph.SyntaxKind.Identifier).forEach(Identifier => {
-          console.log(TrackVars(Identifier).getText())
-        })
-      }
-    })
-
     return Tokens.join('')
   }
-}
-
-function TrackVars(Identifier: TsMorph.Identifier): TsMorph.Node {
-  while (true) {
-    Identifier.findReferences().forEach(Reference => {
-      if (Reference.getDefinition().getDeclarationNode().getChildrenOfKind(TsMorph.SyntaxKind.Identifier).length > 0) {
-        Identifier = Reference.getDefinition().getDeclarationNode().getChildrenOfKind(TsMorph.SyntaxKind.Identifier)[0]
-      }
-    })
-    if (Identifier.getKind() === TsMorph.SyntaxKind.Identifier) {
-      break
-    }
-  }
-  return Identifier.findReferences()[0].getDefinition().getDeclarationNode()
 }
