@@ -81,7 +81,7 @@ export class AdvancedExtractor extends Extractor {
       .filter(EncoderNode => {
         return EncoderNode.getFullText().includes('eyJ')
       })
-      EncoderNodes = EncoderNodes[0].getParent().getChildrenOfKind(TsMorph.SyntaxKind.FunctionDeclaration)
+    EncoderNodes = EncoderNodes[0].getParent().getChildrenOfKind(TsMorph.SyntaxKind.FunctionDeclaration)
     return Tokens.join('')
   }
 }
