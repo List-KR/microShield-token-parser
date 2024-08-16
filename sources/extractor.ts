@@ -74,6 +74,14 @@ export class AdvancedExtractor extends Extractor {
       .filter(EncoderNode => {
         return EncoderNode.getKind() === TsMorph.SyntaxKind.FunctionDeclaration
       })
+      .filter(EncoderNode => {
+        return EncoderNode.getParent().getChildrenOfKind(TsMorph.SyntaxKind.ExpressionStatement)[0]
+        .getChildrenOfKind(TsMorph.SyntaxKind.BinaryExpression).length > 0
+      })
+      .filter(EncoderNode => {
+        return EncoderNode.getFullText().includes('eyJ')
+      })
+      EncoderNodes = EncoderNodes[0].getParent().getChildrenOfKind(TsMorph.SyntaxKind.FunctionDeclaration)
     return Tokens.join('')
   }
 }
