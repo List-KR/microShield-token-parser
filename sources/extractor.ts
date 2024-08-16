@@ -82,6 +82,15 @@ export class AdvancedExtractor extends Extractor {
         return EncoderNode.getFullText().includes('eyJ')
       })
     EncoderNodes = EncoderNodes[0].getParent().getChildrenOfKind(TsMorph.SyntaxKind.FunctionDeclaration)
+
+    const TokenCallExpressionNodes = FileInstance.getDescendantsOfKind(TsMorph.SyntaxKind.CallExpression)
+      .filter(Descendant => {
+        return Descendant.getChildrenOfKind(TsMorph.SyntaxKind.PropertyAccessExpression).length === 1
+        && Descendant.getFullText().includes('.join(')
+      })
+      .filter(Descendant => {
+        return Descendant.getDescendantsOfKind(TsMorph.SyntaxKind.CallExpression).length === 0
+      })
     return Tokens.join('')
   }
 }
