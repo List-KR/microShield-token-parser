@@ -82,6 +82,13 @@ export class AdvancedExtractor extends Extractor {
         return EncoderNode.getFullText().includes('eyJ')
       })
     EncoderNodes = EncoderNodes[0].getParent().getChildrenOfKind(TsMorph.SyntaxKind.FunctionDeclaration)
+    const DecoderNode = EncoderNodes.filter(EncoderNode => !EncoderNode.getText().includes('eyJ'))[0]
+    const EncoderNode = EncoderNodes.filter(EncoderNode => EncoderNode.getText().includes('eyJ'))[0]
+    const MinusNumber = Number(DecoderNode.getFirstDescendantByKind(TsMorph.SyntaxKind.MinusEqualsToken).getParent().getFirstDescendantByKind(TsMorph.SyntaxKind.NumericLiteral).getText())
+    let EncoderStringArray: string[] = []
+    EncoderNode.getFirstDescendantByKind(TsMorph.SyntaxKind.ArrayLiteralExpression).getDescendantsOfKind(TsMorph.SyntaxKind.StringLiteral).forEach(Child => {
+      EncoderStringArray.push(Child.getText().slice(1, -1))
+    })
 
     const TokenCallExpressionNodes = FileInstance.getDescendantsOfKind(TsMorph.SyntaxKind.CallExpression)
       .filter(Descendant => {
@@ -91,6 +98,18 @@ export class AdvancedExtractor extends Extractor {
       .filter(Descendant => {
         return Descendant.getDescendantsOfKind(TsMorph.SyntaxKind.CallExpression).length === 0
       })
+    const TokenIdentifierNodes = TokenCallExpressionNodes[0].getFirstChildByKind(TsMorph.SyntaxKind.PropertyAccessExpression).getDescendantsOfKind(TsMorph.SyntaxKind.Identifier)
+      .filter(Identifier => Identifier.getText() !== 'join')
+    TokenIdentifierNodes.forEach(TokenIdentifier => {
+      const TokenDeclarationNode = TokenIdentifier.findReferences()[0].getDefinition().getDeclarationNode()
+      if (typeof TokenDeclarationNode.getFirstChildByKind(TsMorph.SyntaxKind.StringLiteral) !== 'undefined') {
+        Tokens.push(TokenDeclarationNode.getFirstChildByKind(TsMorph.SyntaxKind.StringLiteral).getText().slice(1, -1))
+      } else {
+        const CurrentParam = Number(TokenDeclarationNode.getFirstDescendantByKind(TsMorph.SyntaxKind.NumericLiteral).getText())
+        Tokens.push(EncoderStringArray[CurrentParam - MinusNumber])
+      }
+    })
+
     return Tokens.join('')
   }
 }
