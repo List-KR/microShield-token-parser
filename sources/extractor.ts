@@ -79,11 +79,11 @@ export class AdvancedExtractor extends Extractor {
         .getChildrenOfKind(TsMorph.SyntaxKind.BinaryExpression).length > 0
       })
       .filter(EncoderNode => {
-        return EncoderNode.getFullText().includes('eyJ')
+        return EncoderNode.getFullText().includes('==')
       })
     EncoderNodes = EncoderNodes[0].getParent().getChildrenOfKind(TsMorph.SyntaxKind.FunctionDeclaration)
-    const DecoderNode = EncoderNodes.filter(EncoderNode => !EncoderNode.getText().includes('eyJ'))[0]
-    const EncoderNode = EncoderNodes.filter(EncoderNode => EncoderNode.getText().includes('eyJ'))[0]
+    const DecoderNode = EncoderNodes.filter(EncoderNode => !EncoderNode.getText().includes('=='))[0]
+    const EncoderNode = EncoderNodes.filter(EncoderNode => EncoderNode.getText().includes('=='))[0]
     const MinusNumber = Number(DecoderNode.getFirstDescendantByKind(TsMorph.SyntaxKind.MinusEqualsToken).getParent().getFirstDescendantByKind(TsMorph.SyntaxKind.NumericLiteral).getText())
     let EncoderStringArray: string[] = []
     EncoderNode.getFirstDescendantByKind(TsMorph.SyntaxKind.ArrayLiteralExpression).getDescendantsOfKind(TsMorph.SyntaxKind.StringLiteral).forEach(Child => {
