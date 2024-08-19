@@ -89,6 +89,22 @@ export class AdvancedExtractor extends Extractor {
     EncoderNode.getFirstDescendantByKind(TsMorph.SyntaxKind.ArrayLiteralExpression).getDescendantsOfKind(TsMorph.SyntaxKind.StringLiteral).forEach(Child => {
       EncoderStringArray.push(Child.getText().slice(1, -1))
     })
+    // Reorder the EncoderStringArray
+    const ReorderConditionNode = FileInstance.getDescendantsOfKind(TsMorph.SyntaxKind.IfStatement)
+      .filter(IfStatement => {
+        return IfStatement.getText().match(/parseInt\(/g)?.length > 8 && IfStatement.getText().includes('break')
+      })[0].getFirstDescendantByKind(TsMorph.SyntaxKind.BinaryExpression)
+    const ReorderConditionVar = ReorderConditionNode.getDescendantsOfKind(TsMorph.SyntaxKind.Identifier)
+      .filter(Identifier => {
+        return Identifier.getParent().getDescendantsOfKind(TsMorph.SyntaxKind.NumericLiteral).length === 1 && Identifier.getText() !== 'parseInt'
+      })[0].getText()
+    while(true) {
+      const ReorderConditionResult = new Function('EncoderStringArray', 'MinusNumber', `const ${ReorderConditionVar} = (I) => { return EncoderStringArray[I - MinusNumber] } \n return ${ReorderConditionNode.getText()}`)(EncoderStringArray, MinusNumber)
+      if (ReorderConditionResult) {
+        break
+      }
+      EncoderStringArray.push(EncoderStringArray.shift())
+    }
 
     const TokenIdentifierNodes = FileInstance.getDescendantsOfKind(TsMorph.SyntaxKind.Identifier)
       .filter(Identifier => {
