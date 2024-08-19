@@ -108,7 +108,9 @@ export class AdvancedExtractor extends Extractor {
 
     const TokenIdentifierNodes = FileInstance.getDescendantsOfKind(TsMorph.SyntaxKind.Identifier)
       .filter(Identifier => {
-        return Identifier.getParent().getText().includes('_') && Identifier.getParent().getDescendantsOfKind(TsMorph.SyntaxKind.Identifier).length === 10
+        return Identifier.getParent().getDescendantsOfKind(TsMorph.SyntaxKind.Identifier).length === 10
+        && typeof Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement) !== 'undefined'
+        && Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement).getText().includes('.concat([')
       })
     TokenIdentifierNodes.forEach(TokenIdentifier => {
       const TokenDeclarationNode = TokenIdentifier.findReferences()[0].getDefinition().getDeclarationNode()
