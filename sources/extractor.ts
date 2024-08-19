@@ -90,16 +90,10 @@ export class AdvancedExtractor extends Extractor {
       EncoderStringArray.push(Child.getText().slice(1, -1))
     })
 
-    const TokenCallExpressionNodes = FileInstance.getDescendantsOfKind(TsMorph.SyntaxKind.CallExpression)
-      .filter(Descendant => {
-        return Descendant.getChildrenOfKind(TsMorph.SyntaxKind.PropertyAccessExpression).length === 1
-        && Descendant.getFullText().includes('.join(')
+    const TokenIdentifierNodes = FileInstance.getDescendantsOfKind(TsMorph.SyntaxKind.Identifier)
+      .filter(Identifier => {
+        return Identifier.getParent().getText().includes('_') && Identifier.getParent().getDescendantsOfKind(TsMorph.SyntaxKind.Identifier).length === 10
       })
-      .filter(Descendant => {
-        return Descendant.getDescendantsOfKind(TsMorph.SyntaxKind.CallExpression).length === 0
-      })
-    const TokenIdentifierNodes = TokenCallExpressionNodes[0].getFirstChildByKind(TsMorph.SyntaxKind.PropertyAccessExpression).getDescendantsOfKind(TsMorph.SyntaxKind.Identifier)
-      .filter(Identifier => Identifier.getText() !== 'join')
     TokenIdentifierNodes.forEach(TokenIdentifier => {
       const TokenDeclarationNode = TokenIdentifier.findReferences()[0].getDefinition().getDeclarationNode()
       if (typeof TokenDeclarationNode.getFirstChildByKind(TsMorph.SyntaxKind.StringLiteral) !== 'undefined') {
