@@ -112,7 +112,9 @@ export class AdvancedExtractor extends Extractor {
         && typeof Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement) !== 'undefined'
         && (Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement).getText().includes('.concat([')
         || Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement).getText().includes('/resources/')
-        || Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement).getText().includes('.endpoint'))
+        || Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement).getText().includes('.endpoint')
+        || Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement).getText().includes('token=')
+        || Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement).getText().includes('_'))
       })
     TokenIdentifierNodes.forEach(TokenIdentifier => {
       const TokenDeclarationNode = TokenIdentifier.findReferences()[0].getDefinition().getDeclarationNode()
