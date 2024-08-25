@@ -108,13 +108,17 @@ export class AdvancedExtractor extends Extractor {
 
     const TokenIdentifierNodes = FileInstance.getDescendantsOfKind(TsMorph.SyntaxKind.Identifier)
       .filter(Identifier => {
-        return Identifier.getParent().getDescendantsOfKind(TsMorph.SyntaxKind.Identifier).length === 10
-        && typeof Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement) !== 'undefined'
-        && (Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement).getText().includes('.concat([')
-        || Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement).getText().includes('/resources/')
-        || Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement).getText().includes('.endpoint')
-        || Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement).getText().includes('token=')
-        || Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement).getText().includes('_'))
+        if (Identifier.getParent().getDescendantsOfKind(TsMorph.SyntaxKind.Identifier).length !== 10
+        || typeof Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement) === 'undefined') {
+          return false
+        }
+        const ReturnStatementText = Identifier.getFirstAncestorByKind(TsMorph.SyntaxKind.ReturnStatement).getText()
+        return ReturnStatementText.includes('.concat([')
+        || ReturnStatementText.includes('/resources/')
+        || ReturnStatementText.includes('.endpoint')
+        || ReturnStatementText.includes('token=')
+        || ReturnStatementText.includes('_')
+        || ReturnStatementText.includes('resources://')
       })
     TokenIdentifierNodes.forEach(TokenIdentifier => {
       const TokenDeclarationNode = TokenIdentifier.findReferences()[0].getDefinition().getDeclarationNode()
