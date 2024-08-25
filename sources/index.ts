@@ -1,3 +1,3 @@
-import { AdvancedExtractor, Extractor } from './extractor.js'
+import { TokenExtractor } from './extractor.js'
 
-export { AdvancedExtractor, Extractor }
+export { TokenExtractor }
