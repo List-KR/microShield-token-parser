@@ -45,7 +45,7 @@ export class TokenExtractor {
     // Reorder the EncoderStringArray
     const ReorderConditionNode = FileInstance.getDescendantsOfKind(TsMorph.SyntaxKind.IfStatement)
       .filter(IfStatement => {
-        return IfStatement.getText().match(/parseInt\(/g)?.length > 8 && IfStatement.getText().includes('break')
+        return IfStatement.getText().match(/parseInt\(/g)?.length > 4 && IfStatement.getText().includes('break')
       })[0].getFirstDescendantByKind(TsMorph.SyntaxKind.BinaryExpression)
     const ReorderConditionVar = ReorderConditionNode.getDescendantsOfKind(TsMorph.SyntaxKind.Identifier)
       .filter(Identifier => {
