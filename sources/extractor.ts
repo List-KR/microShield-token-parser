@@ -1,3 +1,4 @@
+import * as ESToolkit from 'es-toolkit'
 import * as TsMorph from 'ts-morph'
 
 export class TokenExtractor {
@@ -83,6 +84,6 @@ export class TokenExtractor {
       }
     })
 
-    return Tokens.filter((Token, Index) => Index < 10).join('')
+    return ESToolkit.uniq(Tokens).join('')
   }
 }
