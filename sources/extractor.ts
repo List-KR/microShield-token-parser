@@ -83,6 +83,6 @@ export class TokenExtractor {
       }
     })
 
-    return Tokens.join('')
+    return Tokens.filter((Token, Index) => Index < 10).join('')
   }
 }
